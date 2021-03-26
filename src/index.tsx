@@ -1,48 +1,40 @@
-import * as esbuild from 'esbuild-wasm';
 import ReactDOM from 'react-dom';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
+
+import 'bulmaswatch/superhero/bulmaswatch.min.css';
+import './css/codeEditor.css';
+import './css/syntax.css';
+
+import CodeEditor from './components/CodeEditor';
+import Preview from './components/Preview';
+import bundle from './bundler/index';
 
 const App: React.FC = () => {
-  const ref = useRef<any>();
   const [input, setInput] = useState('');
   const [code, setCode] = useState('');
 
-  // function to initialise esBuild, using the esbuild.wasm in public dir. assign it to ref
-  const startService = async () => {
-    ref.current = await esbuild.startService({
-      worker: true,
-      wasmURL: '/esbuild.wasm',
-    });
-  };
-  // start service jsut once, on initial render
-  useEffect(() => {
-    startService();
-  }, []);
-
   const onClick = async () => {
-    // makes sure esBuild service has started
-    if (!ref.current) {
-      return;
-    }
-    // use transform method of esBuild stored in ref, feed in textarea content, and some options
-    const result = await ref.current.transform(input, {
-      loader: 'jsx',
-      target: 'es2015',
-    });
-    setCode(result.code);
+    // feed the contents of the code window into the bundler
+    const output = await bundle(input);
+
+    // sets the code state to be the text bundled by esBuild
+    setCode(output);
   };
+
   return (
     <div>
-      <textarea
-        value={input}
-        onChange={(e) => {
-          setInput(e.target.value);
+      <CodeEditor
+        initialValue='//your code here'
+        onChange={(value) => {
+          setInput(value);
         }}
-      ></textarea>
+      />
+
       <div>
         <button onClick={onClick}>Submit</button>
       </div>
-      <pre>{code}</pre>
+
+      <Preview code={code} />
     </div>
   );
 };
