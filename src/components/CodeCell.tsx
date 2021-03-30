@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 import CodeEditor from './CodeEditor';
 import Preview from './Preview';
-import bundle from '../bundler/index';
+
 import { Cell } from '../state/index';
 import { useActions } from '../hooks/useActions';
+import { useTypedSelector } from '../hooks/useTypedSelector';
 
 import Resizable from './Resizable';
 
@@ -13,28 +14,29 @@ interface CodeCellProps {
 }
 
 const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
-  const [code, setCode] = useState('');
-  const [error, setError] = useState('');
-  // destructure updateCell off the actions object, to use to update redux state with cell contents
-  const { updateCell } = useActions();
+  // destructure updateCell and createBundle off the actions object, to use to update redux state with cell contents
+  const { updateCell, createBundle } = useActions();
+
+  // useTypedSelector is just a selector, and we are fishing out the piece of state that contains
+  // the bundles for this particular code cell
+  const bundle = useTypedSelector((state) => {
+    return state.bundles[cell.id];
+  });
 
   // use effect watches for changes in the code window, and if user pauses for a second,
   // it will compile the code
   useEffect(() => {
     const timer = setTimeout(async () => {
       // feed the contents of the code window into the bundler
-      const output = await bundle(cell.content);
 
-      // sets the code state to be the text bundled by esBuild
-      setCode(output.code);
-      setError(output.err);
+      createBundle(cell.id, cell.content);
     }, 1000);
 
     // clear timer
     return () => {
       clearTimeout(timer);
     };
-  }, [cell.content]);
+  }, [cell.content, cell.id, createBundle]);
 
   return (
     <Resizable direction='vertical'>
@@ -53,7 +55,7 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
             }}
           />
         </Resizable>
-        <Preview code={code} bundlingError={error} />
+        {bundle && <Preview code={bundle.code} bundlingError={bundle.err} />}
       </div>
     </Resizable>
   );

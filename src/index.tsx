@@ -14,8 +14,6 @@ import './css/actionBar.css';
 import './css/cellListItem.css';
 import './css/addCell.css';
 
-import CodeCell from './components/CodeCell';
-import TextEditor from './components/TextEditor';
 import CellList from './components/CellList';
 
 const App: React.FC = () => {
