@@ -1,10 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import MDEditor from '@uiw/react-md-editor';
-import { setServers } from 'dns';
+import { Cell } from '../state/index';
+import { useActions } from '../hooks/useActions';
 
-const TextEditor: React.FC = () => {
+interface TextEditorProps {
+  cell: Cell;
+}
+const TextEditor: React.FC<TextEditorProps> = ({ cell }) => {
   const [editing, setEditing] = useState(false);
-  const [value, setValue] = useState('# Header');
+
+  // destructure updateCell off the actions object, to use to update redux state with cell contents
+  const { updateCell } = useActions();
 
   // set up a ref and bind it to the div containing the full editor component
   const toggleRef = useRef<HTMLDivElement | null>(null);
@@ -39,9 +45,9 @@ const TextEditor: React.FC = () => {
     return (
       <div ref={toggleRef} className='text-editor'>
         <MDEditor
-          value={value}
+          value={cell.content}
           onChange={(v) => {
-            setValue(v || '');
+            updateCell(cell.id, v || '');
           }}
         />
       </div>
@@ -56,7 +62,7 @@ const TextEditor: React.FC = () => {
       className='text-editor card'
     >
       <div className='card-content'>
-        <MDEditor.Markdown source={value} />
+        <MDEditor.Markdown source={cell.content || 'Click to Edit'} />
       </div>
     </div>
   );
