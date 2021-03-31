@@ -8,7 +8,7 @@
 
 # To use:
 
-fork and clone the repo onto your machine.
-navigate to the directory and open in your code editor
-use 'npm install' to install dependencies
-use 'npm start' to start the server
+- fork and clone the repo onto your machine.
+- navigate to the directory and open in your code editor
+- use 'npm install' to install dependencies
+- use 'npm start' to start the server
