@@ -28,7 +28,7 @@ const CellList = () => {
   });
   // render the list of components
   return (
-    <div>
+    <div className='cell-list'>
       <AddCell prevCellId={null} />
       {renderedCells}
     </div>

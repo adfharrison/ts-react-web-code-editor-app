@@ -6,6 +6,7 @@ import Preview from './Preview';
 import { Cell } from '../state/index';
 import { useActions } from '../hooks/useActions';
 import { useTypedSelector } from '../hooks/useTypedSelector';
+import { useCumulativCode } from '../hooks/useCumulativeCode';
 
 import Resizable from './Resizable';
 
@@ -23,17 +24,19 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
     return state.bundles[cell.id];
   });
 
+  const cumulativeCode = useCumulativCode(cell.id);
+
   // use effect watches for changes in the code window, and if user pauses for a second,
   // it will compile the code
   useEffect(() => {
     if (!bundle) {
-      createBundle(cell.id, cell.content);
+      createBundle(cell.id, cumulativeCode);
       return;
     }
     const timer = setTimeout(async () => {
       // feed the contents of the code window into the bundler
 
-      createBundle(cell.id, cell.content);
+      createBundle(cell.id, cumulativeCode);
     }, 1000);
 
     // clear timer
@@ -41,7 +44,7 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
       clearTimeout(timer);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cell.content, cell.id, createBundle]);
+  }, [cumulativeCode, cell.id, createBundle]);
 
   return (
     <Resizable direction='vertical'>

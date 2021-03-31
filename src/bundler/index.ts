@@ -26,6 +26,9 @@ const bundle = async (rawCode: string) => {
       // this option is to tell the bundler that the process.env property NODE_ENV should alsways be set to production (for react stuff)
       // MUST BE A STRING, HENCE THE DOUBLE QUOTES....   global: 'window' is for webpack
       define: { 'process.env.NODE_ENV': '"production"', global: 'window' },
+      // this allows our show function to use react without clashing with user imports
+      jsxFactory: '_React.createElement',
+      jsxFragment: '_React.fragment',
     });
     return {
       code: result.outputFiles[0].text,
