@@ -13,6 +13,7 @@ import './css/textEditor.css';
 import './css/actionBar.css';
 import './css/cellListItem.css';
 import './css/addCell.css';
+import './css/codeCell.css';
 
 import CellList from './components/CellList';
 

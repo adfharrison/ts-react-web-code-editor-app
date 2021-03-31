@@ -26,6 +26,10 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
   // use effect watches for changes in the code window, and if user pauses for a second,
   // it will compile the code
   useEffect(() => {
+    if (!bundle) {
+      createBundle(cell.id, cell.content);
+      return;
+    }
     const timer = setTimeout(async () => {
       // feed the contents of the code window into the bundler
 
@@ -36,6 +40,7 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
     return () => {
       clearTimeout(timer);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cell.content, cell.id, createBundle]);
 
   return (
@@ -55,7 +60,18 @@ const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
             }}
           />
         </Resizable>
-        {bundle && <Preview code={bundle.code} bundlingError={bundle.err} />}
+
+        {!bundle || bundle.loading ? (
+          <div className='progress-wrapper'>
+            <div className='progress-cover'>
+              <progress className='progress is-small is-primary' max='100'>
+                Loading...
+              </progress>
+            </div>
+          </div>
+        ) : (
+          <Preview code={bundle.code} bundlingError={bundle.err} />
+        )}
       </div>
     </Resizable>
   );
